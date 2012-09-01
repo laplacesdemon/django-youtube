@@ -6,7 +6,7 @@ Django Youtube is a wrapper django app around youtube api. It helps you to imple
 The main functionality is to use Youtube API to upload uplisted videos and show them in the website as a social web site do.
 Basically implementing video features on a website using Youtube. In order to achieve this goal, you need a developer account on Youtube and use them to authenticate, and upload videos into this account.
 
-Please feel free to contribute and send patches.
+Please feel free to contribute.
 
 Features
 --------
@@ -33,27 +33,28 @@ gdata python library
 Installation
 ------------
 
-1. Add 'django_youtube' to your installed apps
-2. Add following lines to your settings.py and edit them accordingly
-    
+Add 'django_youtube' to your installed apps
+
+Add following lines to your settings.py and edit them accordingly
+
     YOUTUBE_AUTH_EMAIL = 'yourmail@gmail.com'
     YOUTUBE_AUTH_PASSWORD = 'yourpassword'
     YOUTUBE_DEVELOPER_KEY = 'developer key, get one from http://code.google.com/apis/youtube/dashboard/'
     YOUTUBE_CLIENT_ID = 'client-id'
     
-3. Optionally you can add following lines to your settings. If you don't set them, default settings will be used.
-
+Optionally you can add following lines to your settings. If you don't set them, default settings will be used.
+    
     # url to redirect after upload finishes, default is respected 'video' page
     YOUTUBE_UPLOAD_REDIRECT_URL = '/youtube/videos/'
-    
+
     # url to redirect after deletion video, default is 'upload page'
     YOUTUBE_DELETE_REDIRECT_URL = '/myurl/'
-    
-3. Add Following lines to your urls.py file
-    
+
+Add Following lines to your urls.py file
+
     (r'^youtube/', include('django_youtube.urls')),
     
-4. Don't forget to run 'manage.py syncdb'
+Don't forget to run 'manage.py syncdb'
 
 Usage
 -----
