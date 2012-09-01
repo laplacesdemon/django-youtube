@@ -1,5 +1,0 @@
-<ul>
-    {% for params in video_params %}
-        <li>{% include "django_youtube/video.html" with video_id=params.video_id width=params.width height=params.height origin=params.origin %}</li>
-    {% endfor %}
-</ul>
