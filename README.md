@@ -28,7 +28,7 @@ Features are not yet implemented
 Dependencies
 ------------
 
-gdata python library
+gdata python library (http://code.google.com/p/gdata-python-client/downloads/list)
 
 Installation
 ------------
