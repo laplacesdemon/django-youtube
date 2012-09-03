@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext
 from django_youtube.forms import YoutubeUploadForm
-from django_youtube import api
+from django_youtube.api import Api, AccessControl
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -29,6 +29,7 @@ def video(request, video_id):
     
     # Check video availability
     # Available states are: processing
+    api = Api()
     api.authenticate()
     availability = api.check_upload_status(video_id)
     
@@ -84,16 +85,18 @@ def upload(request):
     
     # Try to create post_url and token to create an upload form
     try:
+        api = Api()
+        
         # upload method needs authentication
-        api.authenticate(settings.YOUTUBE_AUTH_EMAIL, settings.YOUTUBE_AUTH_PASSWORD, settings.YOUTUBE_CLIENT_ID)
+        api.authenticate()
         
         # Customize following line to your needs, you can add description, keywords or developer_keys
         # I prefer to update video information after upload finishes
-        data = api.upload(title, description=description, keywords=keywords, access_control=api.AccessControl.Unlisted)
+        data = api.upload(title, description=description, keywords=keywords, access_control=AccessControl.Unlisted)
     except:
         # An error happened, redirect to homepage
         from django.contrib import messages
-        messages.add_message(request, messages.ERROR, _('An error occurred, Please try again.'))
+        messages.add_message(request, messages.ERROR, _('An error occurred during the upload, Please try again.'))
         return HttpResponseRedirect("/")
     
     # Create the form instance
@@ -119,7 +122,6 @@ def upload_return(request):
         status: status of the upload (200 for success)
         id: id number of the video
     """
-    
     status = request.GET.get("status")
     video_id = request.GET.get("id")
     

@@ -1,5 +1,5 @@
 from django.db import models
-from django_youtube import api
+from django_youtube.api import AccessControl, Api, OperationError
 import django.dispatch
 from django.utils.translation import ugettext as _
 
@@ -18,10 +18,10 @@ class Video(models.Model):
     swf_url = models.URLField(max_length=255, null=True, blank=True)
     access_control = models.SmallIntegerField(max_length=1,
                             choices=(
-                                (api.AccessControl.Public, "Public"),
-                                (api.AccessControl.Unlisted, "Unlisted"),
-                                (api.AccessControl.Private, "Private"),
-                                ), default=api.AccessControl.Public)
+                                (AccessControl.Public, "Public"),
+                                (AccessControl.Unlisted, "Unlisted"),
+                                (AccessControl.Private, "Private"),
+                                ), default=AccessControl.Public)
     
     def __unicode__(self):
         return self.title
@@ -36,14 +36,14 @@ class Video(models.Model):
         Return:
             gdata.youtube.YouTubeVideoEntry
         """
+        api = Api()
         api.authenticate()
         return api.fetch_video(self.video_id)
     
     def save(self, *args, **kwargs):
         """
-        Overrides the default save method
-        Connects to API to fetch detailed info about the video
-        and stores them in the model
+        Syncronize the video information on db with the video on Youtube
+        The reason that I didn't use signals is to avoid saving the video instance twice.
         """
         
         # if this is a new instance add details from api
@@ -58,9 +58,9 @@ class Video(models.Model):
             self.youtube_url = entry.media.player.url
             self.swf_url = entry.GetSwfUrl()
             if entry.media.private:
-                self.access_control = api.AccessControl.Private
+                self.access_control = AccessControl.Private
             else:
-                self.access_control = api.AccessControl.Public
+                self.access_control = AccessControl.Public
             
             # Save the instance
             super(Video, self).save(*args, **kwargs)
@@ -73,13 +73,13 @@ class Video(models.Model):
                 t.save()
         else:
             # updating the video instance
-            # Connect to API and update video on facebook
+            # Connect to API and update video on youtube
+            api = Api()
             
             # update method needs authentication
-            from django.conf import settings
-            api.authenticate(settings.YOUTUBE_AUTH_EMAIL, settings.YOUTUBE_AUTH_PASSWORD, settings.YOUTUBE_CLIENT_ID)
+            api.authenticate()
             
-            # Update the info on youtube
+            # Update the info on youtube, raise error on failure
             api.update_video(self.video_id, self.title, self.description, self.keywords, self.access_control)
             
         # Save the model
@@ -92,17 +92,13 @@ class Video(models.Model):
         Raises:
             OperationError
         """
+        api = Api()
         
         # Authentication is required for deletion
-        from django.conf import settings
-        api.authenticate(settings.YOUTUBE_AUTH_EMAIL, settings.YOUTUBE_AUTH_PASSWORD, settings.YOUTUBE_CLIENT_ID)
+        api.authenticate()
         
-        # Send API request
-        deleted = api.delete_video(self.video_id)
-        
-        # Prevent deletion from db, if api fails
-        if not deleted:
-            raise api.OperationError(_("Cannot be deleted from Youtube"))
+        # Send API request, raises OperationError on unsuccessful deletion
+        api.delete_video(self.video_id)
         
         # Call the super method
         return super(Video, self).delete(*args, **kwargs)
