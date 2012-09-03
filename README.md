@@ -33,6 +33,8 @@ gdata python library (http://code.google.com/p/gdata-python-client/downloads/lis
 Installation
 ------------
 
+Add 'django_youtube' folder at your Python path.
+
 Add 'django_youtube' to your installed apps
 
 Add following lines to your settings.py and edit them accordingly
@@ -67,6 +69,8 @@ Youtube API is integrated to the 'Video' model. To update or delete the 'Video' 
 Api methods can be used seperately. Please see 'api.py' to get info about methods. Please note that some operations requires authentication. Api methods will not do more than one operations, i.e. will not call authenticate method. So you will need to authenticate manually. Please see 'views.py' for sample implementation.
 
 You can use views for uploading, displaying, deleting the videos.
+
+You can also override templates to customize the html. 'Iframe API' used for displaying the videos for convenience. Please see Youtube API Docs (https://developers.google.com/youtube/) to implement other player API's on your template files. Other options are 'Javascript API' and 'Flash API'.
 
 Signals
 -------

@@ -16,6 +16,12 @@ class Video(models.Model):
     is_private = models.BooleanField(default=False)
     youtube_url = models.URLField(max_length=255, null=True, blank=True)
     swf_url = models.URLField(max_length=255, null=True, blank=True)
+    access_control = models.SmallIntegerField(max_length=1,
+                            choices=(
+                                (api.AccessControl.Public, "Public"),
+                                (api.AccessControl.Unlisted, "Unlisted"),
+                                (api.AccessControl.Private, "Private"),
+                                ), default=api.AccessControl.Public)
     
     def __unicode__(self):
         return self.title
@@ -30,6 +36,7 @@ class Video(models.Model):
         Return:
             gdata.youtube.YouTubeVideoEntry
         """
+        api.authenticate()
         return api.fetch_video(self.video_id)
     
     def save(self, *args, **kwargs):
@@ -50,8 +57,11 @@ class Video(models.Model):
             self.keywords = entry.media.keywords.text
             self.youtube_url = entry.media.player.url
             self.swf_url = entry.GetSwfUrl()
-            self.is_private = True if entry.media.private else False
-        
+            if entry.media.private:
+                self.access_control = api.AccessControl.Private
+            else:
+                self.access_control = api.AccessControl.Public
+            
             # Save the instance
             super(Video, self).save(*args, **kwargs)
             
@@ -70,7 +80,7 @@ class Video(models.Model):
             api.authenticate(settings.YOUTUBE_AUTH_EMAIL, settings.YOUTUBE_AUTH_PASSWORD, settings.YOUTUBE_CLIENT_ID)
             
             # Update the info on youtube
-            api.update_video(self.video_id, self.title, self.description, self.keywords)
+            api.update_video(self.video_id, self.title, self.description, self.keywords, self.access_control)
             
         # Save the model
         return super(Video, self).save(*args, **kwargs)

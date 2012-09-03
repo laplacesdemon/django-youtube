@@ -25,6 +25,31 @@ class AccessControl:
     """
     Public, Unlisted, Private = range(3)
 
+def _access_control(access_control):
+    """
+    Prepares the extension element for access control
+    Extension element is the optional parameter for the YouTubeVideoEntry
+    We use extension element to modify access control settings
+    
+    Returns:
+        tuple of extension elements
+    """
+    # Access control
+    extension = None
+    if access_control is AccessControl.Private:
+        # set video as private
+        my_media_group.private = gdata.media.Private()
+    elif access_control is AccessControl.Unlisted:
+        # set video as unlisted
+        from gdata.media import YOUTUBE_NAMESPACE
+        from atom import ExtensionElement
+        kwargs = {
+            "namespace": YOUTUBE_NAMESPACE,
+            "attributes": {'action': 'list', 'permission': 'denied'},
+        }
+        extension = ([ExtensionElement('accessControl', **kwargs)])
+    return extension
+
 def fetch_video(video_id):
     """
     Retrieve a specific video entry and return it
@@ -94,20 +119,8 @@ def upload(title, description="", keywords="", developer_tags = None, access_con
         #player = None
     )
     
-    # Access control
-    extension = None
-    if access_control is AccessControl.Private:
-        # set video as private
-        my_media_group.private = gdata.media.Private()
-    elif access_control is AccessControl.Unlisted:
-        # set video as unlisted
-        from gdata.media import YOUTUBE_NAMESPACE
-        from atom import ExtensionElement
-        kwargs = {
-            "namespace": YOUTUBE_NAMESPACE,
-            "attributes": {'action': 'list', 'permission': 'denied'},
-        }
-        extension = ([ExtensionElement('accessControl', **kwargs)])
+    # Access Control
+    extension = _access_control(access_control)
 
     # create video entry
     video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=extension)
@@ -145,7 +158,7 @@ def check_upload_status(video_id):
     else:
         return True
     
-def update_video(video_id, title="", description="", keywords=""):
+def update_video(video_id, title="", description="", keywords="", access_control=AccessControl.Public):
     """
     Updates the video
     
@@ -161,6 +174,10 @@ def update_video(video_id, title="", description="", keywords=""):
     """
     
     entry = fetch_video(video_id)
+    
+    # Set Access Control
+    extension = _access_control(access_control)
+    entry.extension_elements = extension
     
     if title:
         entry.media.title.text = title
