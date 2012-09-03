@@ -64,13 +64,13 @@ Usage
 Go to '/youtube/upload/' to upload video files directly to youtube. When you upload a file, the video entry is created on youtube, 'Video' model that includes video details (video_id, title, etc.) created on your db and a signal sent that you can add your logic to it.
 After successful upload, it redirects to the specified page at YOUTUBE_UPLOAD_REDIRECT_URL, if no page is specified, it redirects to the corresponding video page.
 
-Youtube API is integrated to the 'Video' model. To update or delete the 'Video' instance, and model will sync the youtube video up automatically.
+Youtube API is integrated to the 'Video' model. In order to change information of the video on Youtube, just save the model instance as you normally do, django_youtube will do the necessary changes using Youtube API.
 
-Api methods can be used seperately. Please see 'api.py' to get info about methods. Please note that some operations requires authentication. Api methods will not do more than one operations, i.e. will not call authenticate method. So you will need to authenticate manually. Please see 'views.py' for sample implementation.
+Api methods can be used separately. Please see 'api.py' to get info about methods. Please note that some operations requires authentication. Api methods will not do more than one operation, i.e. will not call authenticate method. So you will need to authenticate manually. Otherwise api methods will raise 'OperationError'.  Please see 'views.py' for a sample implementation.
 
 You can use views for uploading, displaying, deleting the videos.
 
-You can also override templates to customize the html. 'Iframe API' used for displaying the videos for convenience. Please see Youtube API Docs (https://developers.google.com/youtube/) to implement other player API's on your template files. Other options are 'Javascript API' and 'Flash API'.
+You can also override templates to customise the html. 'Iframe API' used for displaying the videos for convenience. Please see Youtube API Docs (https://developers.google.com/youtube/) to implement other player API's on your template files. Other options are 'Javascript API' and 'Flash API'.
 
 Signals
 -------
