@@ -1,0 +1,4 @@
+Django==1.4.1
+distribute==0.6.27
+wsgiref==0.1.2
+https://gdata-python-client.googlecode.com/files/gdata-2.0.17.tar.gz

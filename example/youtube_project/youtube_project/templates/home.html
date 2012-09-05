@@ -1,0 +1,14 @@
+<h1>Django Youtube Sample Project</h1>
+
+<p>
+	{% if request.user.is_authenticated %}
+		<a href="{% url logout %}">Logout</a>
+	{% else %}
+		<a href="{% url login %}">Login</a> |
+		<a href="">Register</a>
+	{% endif %}
+</p>
+<ul>
+	<li><a href="{% url youtube_video_list %}">List of videos</li>
+	<li><a href="{% url youtube_upload %}">Upload</li>
+</ul>
