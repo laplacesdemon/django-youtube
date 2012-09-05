@@ -13,7 +13,6 @@ class Video(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     keywords = models.CharField(max_length=200, null=True, blank=True, help_text=_("Comma seperated keywords"))
-    is_private = models.BooleanField(default=False)
     youtube_url = models.URLField(max_length=255, null=True, blank=True)
     swf_url = models.URLField(max_length=255, null=True, blank=True)
     access_control = models.SmallIntegerField(max_length=1,
@@ -27,6 +26,9 @@ class Video(models.Model):
         return self.title
     
     def get_absolute_url(self):
+        """
+        Returns the swf url
+        """
         return self.swf_url
     
     def entry(self):

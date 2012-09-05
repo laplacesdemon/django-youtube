@@ -37,11 +37,22 @@ def video(request, video_id):
         # Video is not available
         video = Video.objects.filter(video_id=video_id).get()
         
-        return render_to_response(
-            "django_youtube/video_unavailable.html",
-            {"video":video, "video_id": video_id, "message": _("This video is currently being processed")},
-            context_instance=RequestContext(request)    
-        )
+        state = availability["upload_state"]
+        
+        # Add additional states here. I'm not sure what states are available
+        if state == "failed" or state == "rejected":
+            return render_to_response(
+                "django_youtube/video_failed.html",
+                {"video":video, "video_id": video_id, "message": _("Invalid video."), "availability": availability},
+                context_instance=RequestContext(request)    
+            )
+        else:
+            return render_to_response(
+                "django_youtube/video_unavailable.html",
+                {"video":video, "video_id": video_id,
+                 "message": _("This video is currently being processed"), "availability": availability},
+                context_instance=RequestContext(request)    
+            )
     
     video_params = _video_params(request, video_id)
     
