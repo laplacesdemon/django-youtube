@@ -6,7 +6,7 @@ Please use this project as your reference point.
 Dependencies
 ------------
 
-Since django-youtube requires authentication, 'django-registration' app is used for convenience.
+Please see 'requirements.txt' file for the complete dependancy list. Since django-youtube requires authentication, 'django-registration' app is used for convenience.
 
 Installation
 ------------
