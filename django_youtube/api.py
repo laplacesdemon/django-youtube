@@ -4,17 +4,18 @@ import os
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-class OperationError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+class OperationError(BaseException):
+    """
+    Raise when an error happens on Api class 
+    """
+    pass
 
-class ApiError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+class ApiError(BaseException):
+    """
+    Raise when a Youtube API related error occurs
+    i.e. redirect Youtube errors with this error
+    """
+    pass
 
 class AccessControl:
     """
@@ -34,7 +35,7 @@ class Api:
         try:
             self.developer_key = settings.YOUTUBE_DEVELOPER_KEY
         except AttributeError:
-            raise ApiError("Youtube Developer Key is missing on settings.")
+            raise OperationError("Youtube Developer Key is missing on settings.")
         
         try:
             # client id is not required but will be used for other features like analytics
@@ -101,13 +102,21 @@ class Api:
         Authenticates the user and sets the GData Auth token.
         All params are optional, if not set, we will use the ones on the settings, if no settings found, raises AttributeError
         params are email, password and source. Source is the app id
+
+        Raises:
+            gdata.service.exceptions.BadAuthentication
         """
+        from gdata.service import BadAuthentication
+
         # Auth parameters
         Api.yt_service.email = email if email else settings.YOUTUBE_AUTH_EMAIL
         Api.yt_service.password = password if password else settings.YOUTUBE_AUTH_PASSWORD
         Api.yt_service.source = source if source else settings.YOUTUBE_CLIENT_ID
-        Api.yt_service.ProgrammaticLogin()
-        self.authenticated = True
+        try:
+            Api.yt_service.ProgrammaticLogin()
+            self.authenticated = True
+        except BadAuthentication:
+            raise ApiError(_("Incorrect username or password"))
     
     def upload_direct(self):
         """
@@ -137,7 +146,7 @@ class Api:
         # Raise ApiError if not authenticated
         if not self.authenticated:
             raise ApiError(_("Authentication is required"))
-        
+
         # create media group
         my_media_group = gdata.media.Group(
             title = gdata.media.Title(text=title),

@@ -1,5 +1,13 @@
-<ul>
-    {% for params in video_params %}
-        <li>{% include "django_youtube/video.html" with video_id=params.video_id width=params.width height=params.height origin=params.origin %}</li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+	{% if video_params %}
+		<ul>
+		    {% for params in video_params %}
+		        <li>{% include "django_youtube/video.html" with video_id=params.video_id width=params.width height=params.height origin=params.origin %}</li>
+		    {% endfor %}
+		</ul>
+	{% else %}
+		{% trans "No video found" %}
+	{% endif %}
+{% endblock %}

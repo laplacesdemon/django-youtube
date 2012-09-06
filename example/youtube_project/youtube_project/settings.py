@@ -114,9 +114,15 @@ TEMPLATE_DIRS = (
 
 # Django Youtube settings
 YOUTUBE_AUTH_EMAIL = 'suleymanmelikoglu@gmail.com'
-YOUTUBE_AUTH_PASSWORD = 'amjik906090'
+YOUTUBE_AUTH_PASSWORD = 'mnako3113'
 YOUTUBE_DEVELOPER_KEY = 'AI39si4k5QDTPTXR06pLcstD_HRRkq7QbzEbgGoidYZLgbotvP9pNBQ7k_sfzhPtbYbHkKr_5PL18D2fV1Dt8kaQ1ElIwfZt4A'
 YOUTUBE_CLIENT_ID = 'zuqqa'
+
+# Django registration settings
+ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -130,6 +136,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django_youtube',
+	'registration',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -2,11 +2,12 @@ from django.shortcuts import render_to_response
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext
 from django_youtube.forms import YoutubeUploadForm
-from django_youtube.api import Api, AccessControl
+from django_youtube.api import Api, AccessControl, ApiError
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django_youtube.models import video_created, Video
 import logging
@@ -93,7 +94,7 @@ def upload(request):
     title = request.GET.get("title", "%s's video on %s" % (request.user.username, request.get_host()))
     description = request.GET.get("description", "")
     keywords = request.GET.get("keywords", "")
-    
+
     # Try to create post_url and token to create an upload form
     try:
         api = Api()
@@ -104,9 +105,12 @@ def upload(request):
         # Customize following line to your needs, you can add description, keywords or developer_keys
         # I prefer to update video information after upload finishes
         data = api.upload(title, description=description, keywords=keywords, access_control=AccessControl.Unlisted)
+    except ApiError as e:
+	# An api error happened, redirect to homepage
+        messages.add_message(request, messages.ERROR, e.message)
+        return HttpResponseRedirect("/")
     except:
         # An error happened, redirect to homepage
-        from django.contrib import messages
         messages.add_message(request, messages.ERROR, _('An error occurred during the upload, Please try again.'))
         return HttpResponseRedirect("/")
     

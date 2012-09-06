@@ -1,2 +1,6 @@
-<div>{{ message }}</div>
-<div><img src="{{ video.default_thumbnail.url }}" alt="{{ video.title }}" /></div>
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+    <div>{{ message }}</div>
+    <div><img src="{{ video.default_thumbnail.url }}" alt="{{ video.title }}" /></div>
+{% endblock %}

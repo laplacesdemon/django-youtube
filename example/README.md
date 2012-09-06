@@ -3,6 +3,11 @@ Django Youtube Sample Project
 
 Please use this project as your reference point. 
 
+Dependencies
+------------
+
+Since django-youtube requires authentication, 'django-registration' app is used for convenience.
+
 Installation
 ------------
 
