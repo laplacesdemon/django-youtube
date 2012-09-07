@@ -22,7 +22,6 @@ def _video_params(request, video_id):
     
     return {"video_id": video_id, "origin": origin, "width": width, "height": height}
 
-@login_required
 def video(request, video_id):
     """
     Displays a video in an embed player
@@ -63,12 +62,17 @@ def video(request, video_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
 def video_list(request, username=None):
     """
     list of videos of a user
     if username does not set, shows the currently logged in user
     """
+    
+    # If user is not authenticated and username is None, raise an error
+    if username == None and not request.user.is_authenticated():
+        from django.http import Http404
+        raise Http404
+    
     from django.contrib.auth.models import User
     user = User.objects.get(username=username) if username else request.user
     
