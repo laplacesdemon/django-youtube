@@ -7,8 +7,8 @@ setup(
     version='0.1',
     author=u'Suleyman Melikoglu',
     author_email='suleyman@melikoglu.info',
-	packages=find_packages(),
-	include_package_data=True
+    packages=find_packages(),
+    include_package_data=True,
     url='https://github.com/laplacesdemon/django-youtube',
     license='BSD licence, see LICENCE.txt',
     description='Youtube API wrapper app for Django.' + \
