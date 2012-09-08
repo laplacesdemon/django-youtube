@@ -35,7 +35,7 @@ gdata python library (http://code.google.com/p/gdata-python-client/downloads/lis
 Installation
 ------------
 
-Add 'django_youtube' folder at your Python path.
+Run 'pip install django-youtube' or add 'django_youtube' folder at your python path.
 
 Add 'django_youtube' to your installed apps
 
