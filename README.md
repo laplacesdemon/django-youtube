@@ -14,9 +14,8 @@ Features
 --------
 
 1. Retrieve specific videos
-2. Retrieve feed by a user
 3. Browser based upload
-4. Authentication to reach private data
+4. Programmatic Authentication
 5. Admin panel ready
 6. Supports i18n
 
