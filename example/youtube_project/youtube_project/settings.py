@@ -113,9 +113,9 @@ TEMPLATE_DIRS = (
 )
 
 # Django Youtube settings
-YOUTUBE_AUTH_EMAIL = 'suleymanmelikoglu@gmail.com'
-YOUTUBE_AUTH_PASSWORD = 'mnako3113'
-YOUTUBE_DEVELOPER_KEY = 'AI39si4k5QDTPTXR06pLcstD_HRRkq7QbzEbgGoidYZLgbotvP9pNBQ7k_sfzhPtbYbHkKr_5PL18D2fV1Dt8kaQ1ElIwfZt4A'
+YOUTUBE_AUTH_EMAIL = 'yourEmail@gmail.com'
+YOUTUBE_AUTH_PASSWORD = 'yourPassword'
+YOUTUBE_DEVELOPER_KEY = 'yourApiKey'
 YOUTUBE_CLIENT_ID = 'zuqqa'
 
 # Django registration settings
