@@ -1,14 +1,14 @@
 Django Youtube
 ==============
 
-Django Youtube is a wrapper django app around youtube api. It helps you to implement the frequent api operation easily.
+Django Youtube is a wrapper app around youtube api. It helps you to implement frequent api operations easily.
 
-The main functionality is to use Youtube API to upload uplisted videos and show them in the website as a social web site do.
-Basically implementing video features on a website using Youtube. In order to achieve this goal, you need a developer account on Youtube and use them to authenticate, and upload videos into this account.
+The main functionality is to use Youtube API to upload videos and show them in your website.
+In order use this app, you need a developer account on Youtube and use them to authenticate, and upload videos into this account.
 
 Django Youtube designed to work with built in 'contrib.auth' app, although you can modify the views.py to work without authentication.
 
-Please feel free to contribute.
+Please feel free to fork and contribute!
 
 Features
 --------
