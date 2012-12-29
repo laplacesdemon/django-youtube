@@ -1,5 +1,5 @@
 from django.db import models
-from django_youtube.api import AccessControl, Api, OperationError
+from django_youtube.api import AccessControl, Api
 import django.dispatch
 from django.utils.translation import ugettext as _
 
