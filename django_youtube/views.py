@@ -14,6 +14,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def _video_params(request, video_id):
 
     width = request.GET.get("width", "70%")
@@ -21,6 +22,7 @@ def _video_params(request, video_id):
     origin = request.get_host()
 
     return {"video_id": video_id, "origin": origin, "width": width, "height": height}
+
 
 def video(request, video_id):
     """
@@ -43,13 +45,14 @@ def video(request, video_id):
         if state == "failed" or state == "rejected":
             return render_to_response(
                 "django_youtube/video_failed.html",
-                {"video":video, "video_id": video_id, "message": _("Invalid video."), "availability": availability},
+                {"video": video, "video_id": video_id, "message":
+                    _("Invalid video."), "availability": availability},
                 context_instance=RequestContext(request)
             )
         else:
             return render_to_response(
                 "django_youtube/video_unavailable.html",
-                {"video":video, "video_id": video_id,
+                {"video": video, "video_id": video_id,
                  "message": _("This video is currently being processed"), "availability": availability},
                 context_instance=RequestContext(request)
             )
@@ -62,6 +65,7 @@ def video(request, video_id):
         context_instance=RequestContext(request)
     )
 
+
 def video_list(request, username=None):
     """
     list of videos of a user
@@ -69,7 +73,7 @@ def video_list(request, username=None):
     """
 
     # If user is not authenticated and username is None, raise an error
-    if username == None and not request.user.is_authenticated():
+    if username is None and not request.user.is_authenticated():
         from django.http import Http404
         raise Http404
 
@@ -88,6 +92,7 @@ def video_list(request, username=None):
         context_instance=RequestContext(request)
     )
 
+
 @login_required
 def upload(request):
     """
@@ -95,7 +100,8 @@ def upload(request):
     Creates upload url and token from youtube api and uses them on the form
     """
     # Get the optional parameters
-    title = request.GET.get("title", "%s's video on %s" % (request.user.username, request.get_host()))
+    title = request.GET.get("title", "%s's video on %s" % (
+        request.user.username, request.get_host()))
     description = request.GET.get("description", "")
     keywords = request.GET.get("keywords", "")
 
@@ -108,14 +114,16 @@ def upload(request):
 
         # Customize following line to your needs, you can add description, keywords or developer_keys
         # I prefer to update video information after upload finishes
-        data = api.upload(title, description=description, keywords=keywords, access_control=AccessControl.Unlisted)
+        data = api.upload(title, description=description, keywords=keywords,
+                          access_control=AccessControl.Unlisted)
     except ApiError as e:
-	# An api error happened, redirect to homepage
+        # An api error happened, redirect to homepage
         messages.add_message(request, messages.ERROR, e.message)
         return HttpResponseRedirect("/")
     except:
         # An error happened, redirect to homepage
-        messages.add_message(request, messages.ERROR, _('An error occurred during the upload, Please try again.'))
+        messages.add_message(request, messages.ERROR, _(
+            'An error occurred during the upload, Please try again.'))
         return HttpResponseRedirect("/")
 
     # Create the form instance
@@ -123,12 +131,14 @@ def upload(request):
 
     protocol = 'https' if request.is_secure() else 'http'
     import os
-    next_url = "".join([protocol, ":", os.sep, os.sep, request.get_host(), reverse("django_youtube.views.upload_return"), os.sep])
+    next_url = "".join([protocol, ":", os.sep, os.sep, request.get_host(
+    ), reverse("django_youtube.views.upload_return"), os.sep])
     return render_to_response(
         "django_youtube/upload.html",
-        {"form":form, "post_url":data["post_url"], "next_url": next_url},
+        {"form": form, "post_url": data["post_url"], "next_url": next_url},
         context_instance=RequestContext(request)
     )
+
 
 @login_required
 def upload_return(request):
@@ -160,14 +170,17 @@ def upload_return(request):
         try:
             next_url = settings.YOUTUBE_UPLOAD_REDIRECT_URL
         except AttributeError:
-            next_url = reverse("django_youtube.views.video", kwargs={"video_id":video_id})
+            next_url = reverse(
+                "django_youtube.views.video", kwargs={"video_id": video_id})
 
         return HttpResponseRedirect(next_url)
     else:
         # upload failed, redirect to upload page
         from django.contrib import messages
-        messages.add_message(request, messages.ERROR, _('Upload failed, Please try again.'))
+        messages.add_message(
+            request, messages.ERROR, _('Upload failed, Please try again.'))
         return HttpResponseRedirect(reverse("django_youtube.views.upload"))
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -188,7 +201,8 @@ def remove(request, video_id):
         Video.objects.get(video_id=video_id).delete()
     except:
         from django.contrib import messages
-        messages.add_message(request, messages.ERROR, _('Video could not be deleted.'))
+        messages.add_message(
+            request, messages.ERROR, _('Video could not be deleted.'))
 
     # Return to upload page or specified page
     return HttpResponseRedirect(next_url)
