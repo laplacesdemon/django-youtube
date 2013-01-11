@@ -1,16 +1,18 @@
 from django.shortcuts import render_to_response
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext
-from django_youtube.forms import YoutubeUploadForm
-from django_youtube.api import Api, AccessControl, ApiError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django_youtube.api import Api, AccessControl, ApiError
 from django_youtube.models import video_created, Video
+from django_youtube.forms import YoutubeUploadForm, YoutubeDirectUploadForm
+from django.views.decorators.csrf import csrf_exempt
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +91,86 @@ def video_list(request, username=None):
     return render_to_response(
         "django_youtube/videos.html",
         {"video_params": video_params},
+        context_instance=RequestContext(request)
+    )
+
+
+@csrf_exempt
+@login_required
+def direct_upload(request):
+    """
+    direct upload method
+    starts with uploading video to our server
+    then sends the video file to youtube
+
+    param:
+        (optional) `only_data`: if set, a json response is returns i.e. {'video_id':'124weg'}
+
+    return:
+        if `only_data` set, a json object.
+        otherwise redirects to the video display page
+    """
+    if request.method == "POST":
+        try:
+            form = YoutubeDirectUploadForm(request.POST, request.FILES)
+            # upload the file to our server
+            if form.is_valid():
+                uploaded_video = form.save()
+
+                # send this file to youtube
+                api = Api()
+                api.authenticate()
+                video_entry = api.upload_direct(uploaded_video.file_on_server.path, "Uploaded video from zuqqa")
+
+                # get data from video entry
+                swf_url = video_entry.GetSwfUrl()
+                youtube_url = video_entry.id.text
+
+                # getting video_id is tricky, I can only reach the url which
+                # contains the video_id.
+                # so the only option is to parse the id element
+                # https://groups.google.com/forum/?fromgroups=#!topic/youtube-api-gdata/RRl_h4zuKDQ
+                url_parts = youtube_url.split("/")
+                url_parts.reverse()
+                video_id = url_parts[0]
+
+                # save video_id to video instance
+                video = Video()
+                video.user = request.user
+                video.video_id = video_id
+                video.title = 'tmp video'
+                video.youtube_url = youtube_url
+                video.swf_url = swf_url
+                video.save()
+
+                # delete the uploaded video instance
+                uploaded_video.delete()
+
+                # return the response
+                return_only_data = request.GET.get('only_data')
+                if return_only_data:
+                    return HttpResponse(json.dumps({"video_id": video_id}))
+                else:
+                    # Redirect to the video page or the specified page
+                    try:
+                        next_url = settings.YOUTUBE_UPLOAD_REDIRECT_URL
+                    except AttributeError:
+                        next_url = reverse(
+                            "django_youtube.views.video", kwargs={"video_id": video_id})
+
+                    return HttpResponseRedirect(next_url)
+        except:
+            import sys
+            logger.error("Unexpected error: %s - %s" % (sys.exc_info()[
+                0], sys.exc_info()[1]))
+            # @todo: proper error management
+            return HttpResponse("error happened")
+
+    form = YoutubeDirectUploadForm()
+
+    return render_to_response(
+        "django_youtube/direct-upload.html",
+        {"form": form},
         context_instance=RequestContext(request)
     )
 

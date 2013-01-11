@@ -30,6 +30,7 @@ class AccessControl:
 class Api:
     """
     Wrapper for Youtube API
+    See: https://developers.google.com/youtube/1.0/developers_guide_python
     """
 
     # Service class is a shared resource
@@ -125,11 +126,43 @@ class Api:
         except BadAuthentication:
             raise ApiError(_("Incorrect username or password"))
 
-    def upload_direct(self):
+    def upload_direct(self, video_path, title, description="", keywords="", developer_tags=None, access_control=AccessControl.Public):
         """
-        not implemented yet
+        Direct upload method:
+            Uploads the video directly from your server to Youtube and creates a video
+
+        Returns:
+            gdata.youtube.YouTubeVideoEntry
+
+        See: https://developers.google.com/youtube/1.0/developers_guide_python#UploadingVideos
         """
-        pass
+        # prepare a media group object to hold our video's meta-data
+        my_media_group = gdata.media.Group(
+            title=gdata.media.Title(text=title),
+            description=gdata.media.Description(description_type='plain',
+                                                text=description),
+            keywords=gdata.media.Keywords(text=keywords),
+            category=[gdata.media.Category(
+                text='Autos',
+                scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
+                label='Autos')],
+            #player = None
+        )
+
+        # Access Control
+        extension = self._access_control(access_control, my_media_group)
+
+        # create the gdata.youtube.YouTubeVideoEntry to be uploaded
+        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=extension)
+
+        # add developer tags
+        if developer_tags:
+            video_entry.AddDeveloperTags(developer_tags)
+
+        # upload the video and create a new entry
+        new_entry = Api.yt_service.InsertVideoEntry(video_entry, video_path)
+
+        return new_entry
 
     def upload(self, title, description="", keywords="", developer_tags=None, access_control=AccessControl.Public):
         """
@@ -190,7 +223,7 @@ class Api:
     def check_upload_status(self, video_id):
         """
         Checks the video upload status
-        Newsly uploaded videos may be in the processing state
+        Newly uploaded videos may be in the processing state
 
         Authentication is required
 

@@ -13,6 +13,9 @@ urlpatterns = patterns('django_youtube.views',
     # page that youtube redirects after upload
     url(r'^upload/return/?$', 'upload_return', name="youtube_upload_return"),
 
+    # upload page with a form
+    url(r'^direct-upload/?$', 'direct_upload', name="youtube_direct_upload"),
+
     # remove video, redirects to upload page when it's done
     url(r'^video/remove/(?P<video_id>[\w.@+-]+)/$', 'remove', name="youtube_video_remove"),
 )

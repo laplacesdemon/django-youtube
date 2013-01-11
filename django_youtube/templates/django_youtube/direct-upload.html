@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+    <h2>Direct Upload</h2>
+    <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+	    {{ form.file_on_server }}
+	    <input value="{% trans "Upload video file" %}" type="submit" />
+	</form>
+{% endblock %}
