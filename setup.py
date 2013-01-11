@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
     name='django-youtube',
-    version='0.1',
+    version='0.2',
     author=u'Suleyman Melikoglu',
     author_email='suleyman@melikoglu.info',
     packages=find_packages(),
