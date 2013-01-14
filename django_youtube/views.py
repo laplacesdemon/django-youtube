@@ -26,6 +26,28 @@ def _video_params(request, video_id):
     return {"video_id": video_id, "origin": origin, "width": width, "height": height}
 
 
+def check_video_availability(request, video_id):
+    """
+    Controls the availability of the video. Newly uploaded videos are in processing stage.
+    And others might be rejected.
+
+    Returns:
+        json response
+    """
+    # Check video availability
+    # Available states are: processing
+    api = Api()
+    api.authenticate()
+    availability = api.check_upload_status(video_id)
+
+    if availability is not True:
+        data = {'success': False}
+    else:
+        data = {'success': True}
+
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
 def video(request, video_id):
     """
     Displays a video in an embed player
@@ -143,13 +165,16 @@ def direct_upload(request):
                 video.swf_url = swf_url
                 video.save()
 
+                # send a signal
+                video_created.send(sender=video, video=video)
+
                 # delete the uploaded video instance
                 uploaded_video.delete()
 
                 # return the response
                 return_only_data = request.GET.get('only_data')
                 if return_only_data:
-                    return HttpResponse(json.dumps({"video_id": video_id}))
+                    return HttpResponse(json.dumps({"video_id": video_id}), content_type="application/json")
                 else:
                     # Redirect to the video page or the specified page
                     try:
@@ -168,11 +193,14 @@ def direct_upload(request):
 
     form = YoutubeDirectUploadForm()
 
-    return render_to_response(
-        "django_youtube/direct-upload.html",
-        {"form": form},
-        context_instance=RequestContext(request)
-    )
+    if return_only_data:
+        return HttpResponse(json.dumps({"error": 500}), content_type="application/json")
+    else:
+        return render_to_response(
+            "django_youtube/direct-upload.html",
+            {"form": form},
+            context_instance=RequestContext(request)
+        )
 
 
 @login_required

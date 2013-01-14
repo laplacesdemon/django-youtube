@@ -18,4 +18,8 @@ urlpatterns = patterns('django_youtube.views',
 
     # remove video, redirects to upload page when it's done
     url(r'^video/remove/(?P<video_id>[\w.@+-]+)/$', 'remove', name="youtube_video_remove"),
+
+    # check video availability, returns json response
+    url(r'^check-video-availability/(?P<video_id>[\w.@+-]+)$/?$', 'check_video_availability', name="youtube_check_video_availability"),
+    url(r'^video/(?P<video_id>[\w.@+-]+)/$', 'video', name="youtube_video"),
 )
