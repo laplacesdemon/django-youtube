@@ -240,9 +240,7 @@ def upload(request):
     form = YoutubeUploadForm(initial={"token": data["youtube_token"]})
 
     protocol = 'https' if request.is_secure() else 'http'
-    import os
-    next_url = "".join([protocol, ":", os.sep, os.sep, request.get_host(
-    ), reverse("django_youtube.views.upload_return"), os.sep])
+    next_url = '%s://%s%s/' % (protocol, request.get_host(), reverse("django_youtube.views.upload_return"))
     return render_to_response(
         "django_youtube/upload.html",
         {"form": form, "post_url": data["post_url"], "next_url": next_url},
