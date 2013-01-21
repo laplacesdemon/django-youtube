@@ -2,10 +2,11 @@ from django.db import models
 from django_youtube.api import AccessControl, Api
 import django.dispatch
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 
 class Video(models.Model):
-    user = models.ForeignKey('auth.User')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     video_id = models.CharField(max_length=255, unique=True, null=True,
                                 help_text=_("The Youtube id of the video"))
     title = models.CharField(max_length=200, null=True, blank=True)
