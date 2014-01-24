@@ -89,3 +89,7 @@ Following is an example of how you process the signal
         Not it's time to do something about it
     """
     pass
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/laplacesdemon/django-youtube/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
