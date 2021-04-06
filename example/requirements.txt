@@ -2,4 +2,4 @@ Django==1.11.29
 distribute==0.6.27
 wsgiref==0.1.2
 https://gdata-python-client.googlecode.com/files/gdata-2.0.17.tar.gz
-django-registration==0.8
+django-registration==3.1.2
